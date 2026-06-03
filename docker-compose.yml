@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  backend:
+    build: ./backend
+    container_name: naadnet-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/data:/app/backend/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - ALERT_EMAIL=${ALERT_EMAIL:-admin@naadnet.io}
+      - MOSQUITTO_HOST=mosquitto
+      - MOSQUITTO_PORT=1883
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  dashboard:
+    build: ./dashboard
+    container_name: naadnet-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: naadnet-mosquitto
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - mosquitto_data:/mosquitto/data
+    restart: unless-stopped
+
+volumes:
+  mosquitto_data:
