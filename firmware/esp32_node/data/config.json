@@ -1,0 +1,14 @@
+{
+    "node_id": "HTC-01",
+    "label": "Hitech City",
+    "lat": 17.385,
+    "lng": 78.486,
+    "firmware": "v2.3.1",
+    "threshold": 70,
+    "wifi_ssid": "YourWiFiSSID",
+    "mqtt_broker": "mqtt.naadnet.local",
+    "mqtt_port": 1883,
+    "sample_rate_ms": 100,
+    "sleep_interval_s": 60,
+    "calibration_offset": 0
+}
